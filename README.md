@@ -1,5 +1,7 @@
 # mapping-repository-spring-mongodb
 
+[![Build Status](https://travis-ci.org/skobow/mapping-repository-spring-mongodb.svg?branch=develop)](https://travis-ci.org/skobow/mapping-repository-spring-mongodb)
+
 This project provides a base implementation of a spring mongodb repository that automatically maps document to domain objects and vice versa.
 
 # Synopsis
