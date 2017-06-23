@@ -1,0 +1,23 @@
+plugins {
+    id 'java'
+}
+
+jar {
+    version = '1.0-SNAPSHOT'
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+
+    // Spring
+    compile('org.springframework.data:spring-data-mongodb:1.10.4.RELEASE')
+
+    // Test
+    testCompile('junit:junit:4.12')
+}
