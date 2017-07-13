@@ -17,3 +17,6 @@ hs_err_pid*
 # ide specific
 .idea/
 out/
+build/
+/.nb-gradle/
+.nb-gradle-properties
