@@ -15,12 +15,11 @@ public class MappingDocumentRepositoryTest {
     @Mock
     private MongoTemplate mongoTemplateMock;
 
-    private DocumentMapper documentMapper = new DocumentMapper<Document, Object>
     private MappingDocumentRepository documentRepository;
 
     @Before
     public void setUp() throws Exception {
-        MappingContext mappingContext = new MappingContext<>(new Class<DocumentClass>(), new Class<DomainClass>(),);
+        MappingContext mappingContext = new MappingContext<>(DocumentClass.class, DomainClass.class, null);
         documentRepository = new MappingDocumentRepository(mongoTemplateMock, mappingContext);
     }
 
@@ -30,6 +29,11 @@ public class MappingDocumentRepositoryTest {
     }
     
     class DocumentClass implements Document {
+
+        @Override
+        public String getId() {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
         
     }
     
