@@ -9,18 +9,24 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 
 import org.junit.Test;
 
+import java.util.Optional;
+
 @RunWith(MockitoJUnitRunner.class)
 public class MappingDocumentRepositoryTest {
 
     @Mock
     private MongoTemplate mongoTemplateMock;
 
+    @Mock
+    private DocumentMapper<DocumentClass,DomainClass> documentMapper;
+
     private MappingDocumentRepository documentRepository;
 
     @Before
     public void setUp() throws Exception {
-        MappingContext mappingContext = new MappingContext<>(DocumentClass.class, DomainClass.class, null);
-        documentRepository = new MappingDocumentRepository(mongoTemplateMock, mappingContext);
+        MappingContext mappingContext = new MappingContext<>(DocumentClass.class, DomainClass.class, documentMapper);
+        documentRepository = new MappingDocumentRepository<DocumentClass,DomainClass>(mongoTemplateMock, mappingContext) {
+        };
     }
 
     @Test

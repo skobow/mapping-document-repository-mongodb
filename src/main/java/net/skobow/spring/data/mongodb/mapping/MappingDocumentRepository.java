@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
-public class MappingDocumentRepository<TDocument extends Document, KDomain> {
+public abstract class MappingDocumentRepository<TDocument extends Document, KDomain> {
 
     private final MongoTemplate mongoTemplate;
     private final MappingContext<TDocument, KDomain> mappingContext;
@@ -21,10 +21,10 @@ public class MappingDocumentRepository<TDocument extends Document, KDomain> {
     }
 
     public Optional<KDomain> findById(final String id) {   
-        return findOneByFieldValue("id", id);
+        return findOneByFieldValue(mappingContext.getIdFieldName(), id);
     }
     
-    protected Optional<KDomain> findOneByFieldValue(final String fieldName, final String fieldValue) {
+    private Optional<KDomain> findOneByFieldValue(final String fieldName, final String fieldValue) {
         final Query query = getQuery(fieldName, fieldValue);
         final TDocument document = querySingleDocument(query);
 
@@ -43,7 +43,7 @@ public class MappingDocumentRepository<TDocument extends Document, KDomain> {
         return mongoTemplate.findOne(query, mappingContext.getDocumentType());
     }
     
-    protected Optional<KDomain> mapDocumentToDomainObject(final TDocument document) {
+    private Optional<KDomain> mapDocumentToDomainObject(final TDocument document) {
         if (document == null) {
             return Optional.empty();
         }
