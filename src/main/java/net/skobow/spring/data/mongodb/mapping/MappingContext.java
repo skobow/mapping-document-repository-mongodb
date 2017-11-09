@@ -1,17 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.skobow.spring.data.mongodb.mapping;
 
-import net.skobow.spring.data.mongodb.core.Document;
-
-/**
- *
- * @author skobow
- */
-public class MappingContext<TDocument extends Document, KDomain> {
+public class MappingContext<TDocument, KDomain> {
 
     private final Class<TDocument> documentType;
     private final Class<KDomain> domainType;

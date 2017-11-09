@@ -1,15 +1,11 @@
 package net.skobow.spring.data.mongodb.mapping;
 
-import net.skobow.spring.data.mongodb.core.Document;
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.mongodb.core.MongoTemplate;
-
-import org.junit.Test;
-
-import java.util.Optional;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MappingDocumentRepositoryTest {
@@ -34,9 +30,8 @@ public class MappingDocumentRepositoryTest {
 
     }
     
-    class DocumentClass implements Document {
+    class DocumentClass {
 
-        @Override
         public String getId() {
             throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }

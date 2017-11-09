@@ -1,21 +1,22 @@
 package net.skobow.spring.data.mongodb.mapping;
 
+import java.util.List;
 import java.util.Optional;
-import net.skobow.spring.data.mongodb.core.Document;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.stream.Collectors;
+
+import com.mongodb.WriteResult;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
-public abstract class MappingDocumentRepository<TDocument extends Document, KDomain> {
+public abstract class MappingDocumentRepository<TDocument, KDomain> {
 
     private final MongoTemplate mongoTemplate;
     private final MappingContext<TDocument, KDomain> mappingContext;
 
-    @Autowired
     public MappingDocumentRepository(
-            MongoTemplate mongoTemplate,
-            MappingContext<TDocument, KDomain> mappingContext) {
+            final MongoTemplate mongoTemplate,
+            final MappingContext<TDocument, KDomain> mappingContext) {
         this.mongoTemplate = mongoTemplate;
         this.mappingContext = mappingContext;
     }
@@ -23,14 +24,42 @@ public abstract class MappingDocumentRepository<TDocument extends Document, KDom
     public Optional<KDomain> findById(final String id) {   
         return findOneByFieldValue(mappingContext.getIdFieldName(), id);
     }
-    
-    private Optional<KDomain> findOneByFieldValue(final String fieldName, final String fieldValue) {
+
+    private Optional<KDomain> findOneByFieldValue(final String fieldName, final Object fieldValue) {
         final Query query = getQuery(fieldName, fieldValue);
-        final TDocument document = querySingleDocument(query);
+
+        return querySingleDocument(query)
+                .map(this::mapDocumentToDomainObject);
+    }
+
+    public List<KDomain> findAll() {
+        return mongoTemplate.findAll(mappingContext.getDocumentType()).parallelStream()
+                .map(this::mapDocumentToDomainObject)
+                .collect(Collectors.toList());
+    }
+
+    public KDomain save(final KDomain domainObject) {
+        TDocument document = mapDomainObjectToDocument(domainObject);
+        mongoTemplate.save(document);
 
         return mapDocumentToDomainObject(document);
     }
-    
+
+    public void save(final List<KDomain> domainObjects) {
+        List<TDocument> documents = domainObjects.parallelStream()
+                .map(this::mapDomainObjectToDocument)
+                .collect(Collectors.toList());
+
+        mongoTemplate.insertAll(documents);
+    }
+
+    public boolean delete(final KDomain domainObject) {
+        TDocument document = mapDomainObjectToDocument(domainObject);
+        WriteResult result = mongoTemplate.remove(document);
+
+        return result.getN() > 0;
+    }
+
     private Query getQuery(final String field, final Object value) {
         return getQuery(Criteria.where(field).is(value));
     }
@@ -39,15 +68,15 @@ public abstract class MappingDocumentRepository<TDocument extends Document, KDom
         return Query.query(criteria);
     }
     
-    private TDocument querySingleDocument(final Query query) {
-        return mongoTemplate.findOne(query, mappingContext.getDocumentType());
+    private Optional<TDocument> querySingleDocument(final Query query) {
+        return Optional.ofNullable(mongoTemplate.findOne(query, mappingContext.getDocumentType()));
     }
     
-    private Optional<KDomain> mapDocumentToDomainObject(final TDocument document) {
-        if (document == null) {
-            return Optional.empty();
-        }
-        final KDomain domainObject = mappingContext.getDocumentMapper().map(document);
-        return Optional.ofNullable(domainObject);
+    private KDomain mapDocumentToDomainObject(final TDocument document) {
+        return mappingContext.getDocumentMapper().map(document);
+    }
+
+    private TDocument mapDomainObjectToDocument(final KDomain domainObject) {
+        return mappingContext.getDocumentMapper().mapReverse(domainObject);
     }
 }
